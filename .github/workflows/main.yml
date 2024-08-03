@@ -1,0 +1,44 @@
+name: Test PHP Extension
+
+on:
+  push:
+    branches:
+      - stable
+  pull_request:
+    branches:
+      - stable
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        tools: phpize
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake make gcc
+
+    - name: Build PHP extension
+      run: |
+        phpize
+        ./configure --enable-byiapocket
+        make
+
+    - name: Test PHP extension
+      run: |
+        echo 'extension=$(pwd)/modules/byiapocket.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+        echo '<?php echo confirm_byiapocket_compiled("byiapocket");' > test.php
+        php test.php
