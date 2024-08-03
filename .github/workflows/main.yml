@@ -42,3 +42,9 @@ jobs:
         echo 'extension=$(pwd)/modules/byiapocket.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
         echo '<?php echo confirm_byiapocket_compiled("byiapocket");' > test.php
         php test.php
+        
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: files
+        path: ./
