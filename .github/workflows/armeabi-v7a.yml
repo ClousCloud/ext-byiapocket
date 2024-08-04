@@ -1,4 +1,4 @@
-name: Test PHP Extension
+name: Test PHP Extension armeabi-v7a
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
     - name: Build PHP extension
       run: |
         phpize
-        ./configure --enable-byiapocket
+        ./configure --host=arm-linux-androideabi --with-prefix=$PREFIX --enable-byiapocket
         make
 
     - name: Test PHP extension
