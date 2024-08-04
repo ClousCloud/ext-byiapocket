@@ -1,0 +1,51 @@
+name: Test PHP Extension arm64-v8a
+
+on:
+  push:
+    branches:
+      - stable
+  pull_request:
+    branches:
+      - stable
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        tools: phpize
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake make gcc
+
+    - name: Build PHP extension
+      run: |
+        phpize
+        ./configure --host=aarch64-linux-android --with-prefix=$PREFIX --enable-byiapocket
+        make
+
+    - name: Test PHP extension
+      run: |
+        ini_file=$(php --ini | grep "Loaded Configuration File" | cut -d: -f2 | tr -d ' ')
+        echo "extension=$(pwd)/modules/byiapocket.so" >> $ini_file
+        echo '<?php echo confirm_byiapocket_compiled("byiapocket");' > test.php
+        php test.php
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: files
+        path: ./
