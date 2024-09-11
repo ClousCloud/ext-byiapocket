@@ -2,6 +2,8 @@
   "name": "pocketmine/ext-byiapocket",
   "type": "php-ext",
   "require": {
-    "php": ^8.3
+    "php": "^8.3",
+    "monolog/monolog": "*"
+    
   }
 }
